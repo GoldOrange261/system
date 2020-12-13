@@ -1,4 +1,3 @@
-import keep_alive
 import discord
 from discord.ext import commands
 import json
@@ -13,7 +12,7 @@ bot = commands.Bot(command_prefix= 'syscall ', intents = intents)
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Game('>>製作階段<<'))
+    await bot.change_presence(activity=discord.Game('>>試運行階段<<'))
     print(">> Bot is online <<")
 
 @bot.event
@@ -57,7 +56,12 @@ async def dm(ctx, member: discord.Member, *, msg):
     if member.dm_channel == None:
         await member.create_dm()
     
-    await member.dm_channel.send(msg)
+    embed=discord.Embed(title=None, color=0x60D1F6)
+    embed.set_author(name="由系統發出", icon_url="https://i.imgur.com/DYUdPXX.png")
+    embed.set_thumbnail(url="https://i.imgur.com/haluZrL.png")
+    embed.add_field(name="**一則私人訊息**", value=f'*[Loading...]*\n{msg}\n*[End of File]*', inline=False)
+    embed.set_footer(icon_url = 'https://i.imgur.com/zzGOcth.png', text="請不要直接在此頻道回覆")
+    await member.dm_channel.send(embed=embed)
 
 @bot.command()
 @commands.is_owner()
@@ -112,6 +116,5 @@ async def eList6(ctx):
 #     if filename.endswith('.py'):
 #         bot.load_extension(f'cmds.{filename[:-3]}')
 
-keep_alive.keep_alive()
 if __name__ == "__main__":
     bot.run("Nzg3MzM4MTQ0Njg0MzEwNTM4.X9TfyQ.Hul646oDxTOYrAVjOGYXhXqtKzE")
