@@ -6,8 +6,8 @@ import os
 
 intents = discord.Intents.all()
 
-# with open('setting.json', 'r', encoding='utf8') as jfile:
-#     jdata = json.load(jfile)
+with open('setting.json', 'r', encoding='utf8') as jfile:
+    jdata = json.load(jfile)
 bot = commands.Bot(command_prefix= 'syscall ', intents = intents)
 
 @bot.event
@@ -64,6 +64,18 @@ async def dm(ctx, member: discord.Member, *, msg):
     await member.dm_channel.send(embed=embed)
 
 @bot.command()
+async def nweb(ctx):
+    if ctx.channel.id == 511376568451334157:
+        r = random.randint(100000, 1000000)
+        await ctx.send(f'https://nhentai.net/g/{r}')
+
+@bot.command()
+async def wweb(ctx):
+    if ctx.channel.id == 511376568451334157:
+        r = random.randint(10000, 100000)
+        await ctx.send(f'https://www.wancg.com/photos-index-aid-{r}.html')
+
+@bot.command()
 @commands.is_owner()
 async def eList1(ctx):
     await ctx.message.delete()
@@ -112,9 +124,9 @@ async def eList6(ctx):
     await ctx.send(embed=embed)
          
 
-# for filename in os.listdir('./cmds'):
-#     if filename.endswith('.py'):
-#         bot.load_extension(f'cmds.{filename[:-3]}')
+for filename in os.listdir('./cmds'):
+    if filename.endswith('.py'):
+        bot.load_extension(f'cmds.{filename[:-3]}')
 
 if __name__ == "__main__":
-    bot.run("Nzg3MzM4MTQ0Njg0MzEwNTM4.X9TfyQ.Hul646oDxTOYrAVjOGYXhXqtKzE")
+    bot.run(jdata["TOKEN"])
