@@ -2,6 +2,8 @@ import discord
 from discord.ext import commands
 import json
 import random
+import string
+import time
 import os
 
 intents = discord.Intents.all()
@@ -62,6 +64,60 @@ async def dm(ctx, member: discord.Member, *, msg):
     embed.add_field(name="**一則私人訊息**", value=f'*[Loading...]*\n{msg}\n*[End of File]*', inline=False)
     embed.set_footer(icon_url = 'https://i.imgur.com/zzGOcth.png', text="請不要直接在此頻道回覆")
     await member.dm_channel.send(embed=embed)
+
+@bot.command()
+async def create_link(ctx, age=86400, uses=1, reason=None):
+    invite = await ctx.channel.create_invite(max_age = age, max_uses = uses, reason = reason)
+
+    with open('passcode.json', 'r', encoding='utf8') as j:
+        data = json.load(j)
+    passcode = ''.join(random.choice(string.ascii_letters + string.digits) for x in range(6))
+    data[passcode] = uses
+    with open('passcode.json', 'w', encoding='utf8') as f:
+        json.dump(data, f)
+    
+    embed=discord.Embed(title="**創建成功**", color=0x71EFAE)
+    embed.set_author(name="系統訊息", icon_url="https://i.imgur.com/DYUdPXX.png")
+    embed.set_thumbnail(url="https://i.imgur.com/yTEkURa.png")
+    embed.set_footer(icon_url = 'https://i.imgur.com/zzGOcth.png', text="感謝您使用本服務")
+    await ctx.send(embed=embed)
+    await ctx.send(invite.url)
+
+@bot.command()
+@commands.has_permissions(administrator= True)
+async def query_password(ctx):
+    with open('passcode.json', 'r', encoding='utf8') as j:
+        data = json.load(j)
+    await ctx.send(f'```\n{data}\n```')
+
+@bot.command()
+async def check(ctx, passcode):
+    await ctx.message.delete()
+    with open('passcode.json', 'r', encoding='utf8') as j:
+        data = json.load(j)
+
+    if str(passcode) in data:
+        guild = bot.get_guild(509693135539142658)
+        drole = guild.get_role(788802343641808917)
+        await ctx.author.remove_roles(drole)
+        if data[passcode] - 1 == 0:
+            data.pop(passcode)
+        else:
+            data[passcode] -= 1
+        with open('passcode.json', 'w', encoding='utf8') as f:
+            json.dump(data, f)
+        embed=discord.Embed(title="**認證成功**", color=0x71EFAE)
+        embed.set_thumbnail(url="https://i.imgur.com/yTEkURa.png")
+        embed.set_footer(icon_url = 'https://i.imgur.com/zzGOcth.png', text="歡迎進入伺服器")
+    else:
+        embed=discord.Embed(title="**認證失敗**", color=0xff0000)
+        embed.set_thumbnail(url="https://i.imgur.com/GPIo93l.png")
+        embed.set_footer(icon_url = 'https://i.imgur.com/zzGOcth.png', text="密碼有誤，請重試")
+
+    embed.set_author(name="系統訊息", icon_url="https://i.imgur.com/DYUdPXX.png")
+    msg = await ctx.send(embed=embed)
+    time.sleep(5)
+    await msg.delete()
 
 @bot.event
 async def on_command_error(ctx, error):
