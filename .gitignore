@@ -128,3 +128,5 @@ password.json
 
 # Pyre type checker
 .pyre/
+passcode.json
+setting.json
