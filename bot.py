@@ -89,6 +89,58 @@ async def query_password(ctx):
     with open('passcode.json', 'r', encoding='utf8') as j:
         data = json.load(j)
     await ctx.send(f'```\n{data}\n```')
+    
+@bot.command()
+@commands.has_permissions(administrator= True)
+async def add_password(ctx, password, uses):
+    await ctx.message.delete()
+    with open('passcode.json', 'r', encoding='utf8') as j:
+        data = json.load(j)
+    if password in data:
+        data[password] += int(uses)
+    else:
+        data[password] = int(uses)
+    with open('passcode.json', 'w', encoding='utf8') as f:
+        json.dump(data, f)
+        
+    embed=discord.Embed(title="**已新增密碼**", color=0x71EFAE)
+    embed.set_author(name="系統訊息", icon_url="https://i.imgur.com/DYUdPXX.png")
+    embed.set_thumbnail(url="https://i.imgur.com/yTEkURa.png")
+    embed.set_footer(icon_url = 'https://i.imgur.com/zzGOcth.png', text="感謝您使用本服務")
+    await ctx.send(embed=embed)
+    
+    if ctx.author.dm_channel == None:
+        await ctx.author.create_dm()
+    
+    embed=discord.Embed(title=None, color=0x60D1F6)
+    embed.set_author(name="由系統發出", icon_url="https://i.imgur.com/DYUdPXX.png")
+    embed.set_thumbnail(url="https://i.imgur.com/haluZrL.png")
+    embed.add_field(name="**一則私人訊息**", value=f'*[Loading...]*\n您已創建了一個密碼:`{password}`\n使用次數:`{uses}`\n*[End of File]*', inline=False)
+    embed.set_footer(icon_url = 'https://i.imgur.com/zzGOcth.png', text="請不要直接在此頻道回覆")
+    await ctx.author.dm_channel.send(embed=embed)
+    
+@bot.command()
+@commands.has_permissions(administrator= True)
+async def delete_password(ctx, password):
+    await ctx.message.delete()
+    with open('passcode.json', 'r', encoding='utf8') as j:
+        data = json.load(j)
+    if password in data:
+        data.pop(password)
+        embed=discord.Embed(title="**已移除密碼**", color=0x71EFAE)
+        embed.set_footer(icon_url = 'https://i.imgur.com/zzGOcth.png', text="感謝您使用本服務")
+        url="https://i.imgur.com/yTEkURa.png"
+    else:
+        embed=discord.Embed(title="**查無此密碼**", color=0xff0000)
+        embed.set_footer(icon_url = 'https://i.imgur.com/zzGOcth.png', text="請輸入正確的密碼")
+        url="https://i.imgur.com/g1THUl5.png"
+    with open('passcode.json', 'w', encoding='utf8') as f:
+        json.dump(data, f)
+        
+    
+    embed.set_author(name="系統訊息", icon_url="https://i.imgur.com/DYUdPXX.png")
+    embed.set_thumbnail(url = url)
+    await ctx.send(embed=embed)
 
 @bot.command()
 async def check(ctx, passcode):
